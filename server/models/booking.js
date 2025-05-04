@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
   Booking.init(
     {
       book_date: {
-        type: DataTypes.DATE,
+        type: DataTypes.STRING,
         allowNull: false,
         validate: {
           notNull: {
@@ -32,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
       booked_hour: {
-        type: DataTypes.TIME,
+        type: DataTypes.STRING,
         allowNull: false,
         validate: {
           notNull: {
@@ -44,7 +44,7 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
       booked_hour_end: {
-        type: DataTypes.TIME,
+        type: DataTypes.STRING,
         allowNull: false,
         validate: {
           notNull: {

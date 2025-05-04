@@ -24,6 +24,7 @@ class User_Service {
       error.statusCode = 404;
       throw error;
     }
+
     if (!Hashing.comparePass(obj.password, user.password)) {
       throw { name: "Invalid Login" };
     }

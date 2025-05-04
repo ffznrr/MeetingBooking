@@ -1,3 +1,5 @@
+const e = require("express");
+
 const ErrorHandler = (err, req, res, next) => {
   let statusCode = 500;
   let message = "Internal Server Error";
@@ -11,7 +13,27 @@ const ErrorHandler = (err, req, res, next) => {
 
   if (err.name == "Data Not Found") {
     message = "Data Not Found";
-    statusCode = err.status;
+    statusCode = 404;
+  }
+
+  if (err.message == "timeerr") {
+    message = err.name;
+    statusCode = 400;
+  }
+
+  if (err.name == "the room has been booked by someone else") {
+    message = err.name;
+    statusCode = 400;
+  }
+
+  if (err.name === "The end time must be later than the booking time.") {
+    message = "The end time must be later than the booking time.";
+    statusCode = 400;
+  }
+
+  if (err.name == "Room has been Booked by someone else") {
+    message = "Room has been Booked by someone else";
+    statusCode = 400;
   }
 
   if (err.name == "can't delete booking, room is not booked by anyone") {

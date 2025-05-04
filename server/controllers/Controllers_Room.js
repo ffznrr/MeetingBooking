@@ -14,18 +14,8 @@ class Room {
 
   static async getRoom(req, res, next) {
     try {
-      const { id, role } = req.additionalData;
-      let result;
-
-      if (role == "User") {
-        result = room_service.viewroomuser({ id, role });
-      } else {
-        result = room_service.viewroomadmin({ id, role });
-      }
-
-      res.json(200).json({ data: result, statusCode: 200 });
-    } catch (err) {
-      next(err);
+    } catch (error) {
+      next(error);
     }
   }
 }

@@ -4,19 +4,18 @@ class Booking {
   static async controllers_createBook(req, res, next) {
     try {
       const { id } = req.additionalData;
-      const { book_date, booked_hour, roomId } = req.body;
+      const { book_date, booked_hour, booked_hour_end, roomId } = req.body;
 
-      const [_, findRoomName] = await Promise.all([
-        Booking_service.createbook({
-          book_date,
-          booked_hour,
-          roomId,
-          userId: id,
-        }),
-        Booking_service.findName(roomId),
-      ]);
+      await Booking_service.createbook({
+        book_date,
+        booked_hour,
+        booked_hour_end,
+        roomId,
+        userId: id,
+      });
+
       res.status(200).json({
-        message: `You have just booked ${findRoomName.name} room on ${book_date} for the ${booked_hour} session.`,
+        message: `You have just booked room on ${book_date} for the ${booked_hour} session.`,
       });
     } catch (error) {
       next(error);
@@ -27,15 +26,21 @@ class Booking {
     try {
       const { role } = req.additionalData;
       const { id } = req.params;
+      const userId = req.additionalData.id;
 
-      const checkStatus = await Booking_service.checkstatus_service(id);
+      await Booking_service.checkstatus_service(id);
 
       let result;
-      // if(role == "User"){
-      //  result = await Booking_service.CancelBookUser_Service
-      // }else{
-      //   result = await Booking_service.CancelBookAdmin_Service
-      // }
+      if (role == "User") {
+        console.log(role);
+        result = await Booking_service.CancelBookUser_Service(id, userId);
+      } else {
+        result = await Booking_service.CancelBookAdmin_Service(id);
+      }
+
+      res
+        .status(200)
+        .json({ message: "Status Sukses di ganti", statusCode: 200 });
     } catch (error) {
       next(error);
     }

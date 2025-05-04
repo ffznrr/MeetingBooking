@@ -11,9 +11,12 @@ app.post("/login", Authentication.login);
 
 app.use(UserAuthentication);
 
+// Room
 app.post("/createroom", AdminAuthorization.AdminAuth, Room.createRoom);
-app.post("/createbooking", Booking.controllers_createBook);
+app.get("/viewroom", Room.getRoom);
 
+// Booking
+app.post("/createbooking", Booking.controllers_createBook);
 app.get("/viewbooking", Booking.controllers_viewbook);
 app.put("/cancelbooking/:id", Booking.controllers_cancelBooking);
 
