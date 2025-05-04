@@ -1,7 +1,9 @@
-const Button = ({ className, text }) => {
+const Button = ({ className, text, type }) => {
   return (
     <>
-      <div></div>
+      <button type={type} className={`w-20 h-10 border-1 ${className}`}>
+        {text}
+      </button>
     </>
   );
 };

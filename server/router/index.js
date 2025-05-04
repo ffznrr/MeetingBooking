@@ -10,7 +10,6 @@ app.post("/register", Authentication.register);
 app.post("/login", Authentication.login);
 
 app.use(UserAuthentication);
-
 // Room
 app.post("/createroom", AdminAuthorization.AdminAuth, Room.createRoom);
 app.get("/viewroom", Room.getRoom);
