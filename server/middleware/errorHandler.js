@@ -4,10 +4,20 @@ const ErrorHandler = (err, req, res, next) => {
   let statusCode = 500;
   let message = "Internal Server Error";
 
-  console.log(err);
-
   if (err.name === "Room name already taken") {
     message = "Room name already taken";
+    statusCode = 400;
+  }
+
+  if (err.name == "Booking not found or doesn't belong to this user") {
+    message = "Booking not found or doesn't belong to this user";
+    statusCode = 404;
+  }
+
+  if (
+    err.name == "The room has been booked by someone else at the selected time."
+  ) {
+    message = "The room has been booked by someone else at the selected time.";
     statusCode = 400;
   }
 

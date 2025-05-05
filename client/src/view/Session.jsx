@@ -14,15 +14,15 @@ const Session = () => {
     queryFn: () => fetchRoomDetail(id, localStorage.access_token),
   });
 
-  const booked = data?.message?.Bookings || [];
-
   const { search } = useLocation();
   const dateParam = new URLSearchParams(search).get("date");
 
   const [selectedTimeStart, setSelectedTimeStart] = useState("");
   const [selectedTimeEnd, setSelectedTimeEnd] = useState("");
 
-  const dataClock = [
+  let bookinghour = data?.message?.Bookings || [];
+
+  const meetingStartTime = [
     "09:00",
     "10:00",
     "11:00",
@@ -30,6 +30,16 @@ const Session = () => {
     "14:00",
     "15:00",
     "16:00",
+  ];
+
+  const meetingEndTime = [
+    "10:00",
+    "11:00",
+    "12:00",
+    "14:00",
+    "15:00",
+    "16:00",
+    "17:00",
   ];
 
   const currDate = () => {
@@ -59,52 +69,27 @@ const Session = () => {
     return `${year}/${month}/${day}`;
   };
 
-  const isTimeBooked = (time) => {
-    const year = getYear(dateParam);
-    return booked?.some(
-      (booking) => booking.booked_hour === time && booking.book_date === year
-    );
-  };
-
   const handleTimeSelect = (time) => {
-    if (
-      (time.split(":")[0] >= hour() ||
-        getYear(currDate()) !== getYear(dateParam)) &&
-      !isTimeBooked(time)
-    ) {
-      if (!selectedTimeStart) {
-        setSelectedTimeStart(time);
-        Toastify({
-          text: `Start Time Set: ${time}`,
-          duration: 3000,
-          gravity: "bottom",
-          position: "right",
-          style: {
-            background: "linear-gradient(to right, #3F4F44, #3F4F44)",
-          },
-        }).showToast();
-      } else {
-        setSelectedTimeEnd(time);
-        setTimeout(() => {
-          Toastify({
-            text: `End Time Set: ${time}`,
-            duration: 3000,
-            gravity: "bottom",
-            position: "right",
-            style: {
-              background: "linear-gradient(to right, #3F4F44, #3F4F44)",
-            },
-          }).showToast();
-        }, 2000);
-      }
-    } else {
+    if (selectedTimeStart.length == "") {
+      setSelectedTimeStart(time);
       Toastify({
-        text: "Cannot select this time slot",
+        text: `Set Start Time: ${time}`,
         duration: 3000,
-        gravity: "bottom",
+        gravity: "top",
         position: "right",
         style: {
-          background: "linear-gradient(to right, #C5172E, #FF4C4C)",
+          background: "linear-gradient(to right, #3F4F44, #3F4F44)",
+        },
+      }).showToast();
+    } else {
+      setSelectedTimeEnd(time);
+      Toastify({
+        text: `Set End Time: ${time}`,
+        duration: 3000,
+        gravity: "top",
+        position: "right",
+        style: {
+          background: "linear-gradient(to right, #3F4F44, #3F4F44)",
         },
       }).showToast();
     }
@@ -113,21 +98,28 @@ const Session = () => {
   const { mutate } = useMutation({
     mutationFn: PostBooking,
     onSuccess: (data) => {
-      setTimeout(() => {
-        Toastify({
-          text: data.message,
-          duration: 7000,
-          gravity: "bottom",
-          position: "right",
-          style: {
-            background: "linear-gradient(to right, #3F4F44, #3F4F44)",
-          },
-        }).showToast();
-      }, 2000);
+      Toastify({
+        text: data.message,
+        duration: 7000,
+        gravity: "bottom",
+        position: "right",
+        style: {
+          background: "linear-gradient(to right, #3F4F44, #3F4F44)",
+        },
+      }).showToast();
+
       navigate("/");
     },
     onError: (error) => {
-      console.log(error);
+      Toastify({
+        text: error?.message || "Something went wrong",
+        duration: 7000,
+        gravity: "bottom",
+        position: "right",
+        style: {
+          background: "linear-gradient(to right, #3F4F44, #3F4F44)",
+        },
+      }).showToast();
     },
   });
 
@@ -141,6 +133,40 @@ const Session = () => {
     };
 
     mutate(obj);
+  };
+
+  const itIsBooked = (time) => {
+    if (!bookinghour) return time;
+    const matchingBookings = bookinghour.filter(
+      (v) =>
+        time >= v.booked_hour &&
+        time < v.booked_hour_end &&
+        v.room_condition == "Booked" &&
+        v.book_date == getYear(dateParam)
+    );
+
+    if (matchingBookings.length > 0) {
+      return "Booked";
+    }
+
+    return time;
+  };
+
+  const itIsBookedEnd = (time) => {
+    if (!bookinghour) return time;
+    const matchingBookings = bookinghour.filter(
+      (v) =>
+        time >= v.booked_hour &&
+        time <= v.booked_hour_end &&
+        v.room_condition == "Booked" &&
+        v.book_date == getYear(dateParam)
+    );
+
+    if (matchingBookings.length > 0) {
+      return "Booked";
+    }
+
+    return time;
   };
 
   return (
@@ -158,67 +184,76 @@ const Session = () => {
         </p>
       </div>
 
-      <h2 className="text-xl font-semibold text-[#3F4F44] mb-4">
-        Available Times
-      </h2>
-
+      {selectedTimeStart == "" ? (
+        <h2 className="text-xl font-semibold text-[#3F4F44] mb-4">
+          Select Start Meeting Time :
+        </h2>
+      ) : (
+        <h2 className="text-xl font-semibold text-[#3F4F44] mb-4">
+          Select End Meeting Time :
+        </h2>
+      )}
       <div className="grid grid-cols-4 gap-4">
-        {dataClock.map((time, i) => (
-          <div key={i} className="relative">
-            <div
-              onClick={() => handleTimeSelect(time)}
-              className={`border-2 w-full h-20 flex justify-center items-center cursor-pointer rounded-md 
-                ${
-                  time.split(":")[0] < hour() &&
-                  getYear(currDate()) === getYear(dateParam)
-                    ? isTimeBooked(time)
-                      ? "bg-gray-300 cursor-not-allowed"
-                      : "bg-[#3F4F44] text-[#FBFFE4]"
-                    : "bg-[#FBFFE4] text-[#3F4F44]"
-                }
-                ${
-                  selectedTimeStart === time || selectedTimeEnd === time
-                    ? "border-[#3F4F44] text-2xl"
-                    : ""
-                }
-              `}
-            >
-              <h2>{isTimeBooked(time) ? "Booked" : time}</h2>
-            </div>
-            {selectedTimeStart === time && (
-              <div className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-full bg-green-400 flex justify-center items-center">
-                <h1 className="text-xl text-[#3F4F44]">Start</h1>
+        {selectedTimeStart === ""
+          ? meetingStartTime.map((time, i) => (
+              <div key={i} className="relative">
+                {itIsBooked(time) == "Booked" ? (
+                  <div
+                    className={`border-2 w-full h-20 flex justify-center items-center cursor rounded-md bg-red-500 text-white
+                  ${
+                    selectedTimeStart === time || selectedTimeEnd === time
+                      ? "border-[#3F4F44] text-2xl"
+                      : ""
+                  }
+                `}
+                  >
+                    <h2>{itIsBooked(time)}</h2>
+                  </div>
+                ) : (
+                  <div
+                    onClick={() => handleTimeSelect(time)}
+                    className={`border-2 w-full h-20 flex justify-center items-center cursor-pointer rounded-md hover:text-[#FBFFE4] hover:bg-[#3F4F44]
+                  ${
+                    selectedTimeStart === time || selectedTimeEnd === time
+                      ? "border-[#3F4F44] text-2xl"
+                      : ""
+                  }
+                `}
+                  >
+                    <h2>{itIsBooked(time)}</h2>
+                  </div>
+                )}
               </div>
-            )}
-            {selectedTimeEnd === time && (
-              <div className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-full bg-red-400 flex justify-center items-center">
-                <h1 className="text-xl text-[#3F4F44]">End</h1>
+            ))
+          : meetingEndTime.map((time, i) => (
+              <div key={i} className="relative">
+                {itIsBookedEnd(time) == "Booked" ? (
+                  <div
+                    key={i}
+                    className={`border-2 w-full h-20 flex justify-center items-center cursor-pointer rounded-md bg-red-500 text-white`}
+                  >
+                    <h2>{itIsBookedEnd(time)}</h2>
+                  </div>
+                ) : (
+                  <div
+                    key={i}
+                    onClick={() => handleTimeSelect(time)}
+                    className={`border-2 w-full h-20 flex justify-center items-center cursor-pointer rounded-md hover:bg-[#3F4F44] hover:text-[#FBFFE4]`}
+                  >
+                    <h2>{itIsBookedEnd(time)}</h2>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        ))}
+            ))}
       </div>
 
-      {selectedTimeStart && selectedTimeEnd && (
-        <div className="mt-4">
-          <h3 className="text-lg font-semibold text-[#3F4F44]">
-            Selected Time Slot: {selectedTimeStart} -{" "}
-            {Number(selectedTimeEnd.split(":")[0]) +
-              1 +
-              ":" +
-              selectedTimeEnd.split(":")[1]}
-          </h3>
-        </div>
-      )}
-      {selectedTimeStart && selectedTimeEnd && (
-        <div className="mt-4 flex justify-center">
-          <Button
-            onClick={handleSubmitSession}
-            text={"Submit"}
-            className={"bg-[#FBFFE4] text-[#3F4F44]"}
-          />
-        </div>
-      )}
+      <div className="mt-4 flex justify-center">
+        <Button
+          onClick={handleSubmitSession}
+          text={"Submit"}
+          className={"bg-[#FBFFE4] text-[#3F4F44]"}
+        />
+      </div>
     </div>
   );
 };

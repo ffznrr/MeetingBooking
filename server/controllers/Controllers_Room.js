@@ -26,11 +26,8 @@ class Room {
   static async ViewRoom_controllers(req, res, next) {
     try {
       const { id } = req.additionalData;
-      const { page = 1, limit = 10 } = req.query;
+      const { page = 1, limit = 6 } = req.query;
       const result = await room_service.getroom(id, page, limit);
-      if (result.rooms.length < 1) {
-        throw { name: "Data Not Found" };
-      }
 
       return res.json({
         rooms: result.rooms,

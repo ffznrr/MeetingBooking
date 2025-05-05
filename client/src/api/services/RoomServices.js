@@ -11,6 +11,7 @@ export const fetchRoom = async (token) => {
 
   if (!response.ok) {
     const error = await response.json();
+
     throw new Error(error.message || "Failed to fetch room data");
   }
 

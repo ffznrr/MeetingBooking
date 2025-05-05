@@ -3,15 +3,21 @@ const { Booking, Room, Sequelize } = require("../models");
 class Booking_service {
   static async createbook(obj) {
     let { book_date, booked_hour, roomId, booked_hour_end, userId } = obj;
+
+    // Split the start and end time
     let booked_hour_split = booked_hour.split(":");
     let booked_hour_end_split = booked_hour_end.split(":");
-    if (booked_hour_end_split[0] < booked_hour_split[0]) {
+
+    // Check if the end time is later than the start time
+    if (
+      Number(booked_hour_end_split[0]) < Number(booked_hour_split[0]) ||
+      (Number(booked_hour_end_split[0]) === Number(booked_hour_split[0]) &&
+        Number(booked_hour_end_split[1]) <= Number(booked_hour_split[1]))
+    ) {
       throw { name: "The end time must be later than the booking time." };
-    } else if (booked_hour_end_split[0] == booked_hour_split[0]) {
-      if (booked_hour_end_split[1] <= booked_hour_split[1]) {
-        throw { name: "The end time must be later than the booking time." };
-      }
     }
+
+    // Check for overlapping bookings for the same date and room
     const overlappingBooking = await Booking.findOne({
       where: {
         roomId,
@@ -20,25 +26,35 @@ class Booking_service {
     });
 
     if (overlappingBooking) {
-      let overbookedhour = overlappingBooking.booked_hour.split(":");
-      let overbookedhourend = overlappingBooking.booked_hour_end.split(":");
+      let overbookedhour_split = overlappingBooking.booked_hour.split(":");
+      let overbookedhour_end_split =
+        overlappingBooking.booked_hour_end.split(":");
 
+      // Convert all times into minutes for easier comparison
+      let booked_start_minutes =
+        Number(booked_hour_split[0]) * 60 + Number(booked_hour_split[1]);
+      let booked_end_minutes =
+        Number(booked_hour_end_split[0]) * 60 +
+        Number(booked_hour_end_split[1]);
+      let overbooked_start_minutes =
+        Number(overbookedhour_split[0]) * 60 + Number(overbookedhour_split[1]);
+      let overbooked_end_minutes =
+        Number(overbookedhour_end_split[0]) * 60 +
+        Number(overbookedhour_end_split[1]);
+
+      // Check if the booking time overlaps with an existing booking
       if (
-        booked_hour_split[0] <= overbookedhourend[0] &&
-        booked_hour_split[0] >= overbookedhour[0]
-      ) {
-        throw { name: "the room has been booked by someone else" };
-      } else if (
-        booked_hour_end_split[0] <= overbookedhourend[0] &&
-        booked_hour_end_split[0] >= overbookedhour[0]
+        booked_start_minutes < overbooked_end_minutes &&
+        booked_end_minutes > overbooked_start_minutes &&
+        overlappingBooking.room_condition !== "Canceled"
       ) {
         throw {
-          name: `you can end your session between ${overbookedhour[0]} o'clock and ${overbookedhourend[0]} o'clock`,
-          message: "timeerr",
+          name: "The room has been booked by someone else at the selected time.",
         };
       }
     }
 
+    // Create the booking if no overlap is found
     const result = await Booking.create({
       book_date,
       booked_hour,
@@ -86,6 +102,7 @@ class Booking_service {
 
   static async CancelBookAdmin_Service(id) {
     const findOne = await Booking.findOne({ where: { id } });
+    if (!findOne) throw { name: "Data Not Found" };
     const result = await Booking.update(
       {
         room_condition:
@@ -97,19 +114,34 @@ class Booking_service {
   }
 
   static async CancelBookUser_Service(id, userId) {
-    const findOne = await Booking.findOne({ where: { id } });
+    const booking = await Booking.findOne({
+      where: { id, userId },
+    });
 
-    if (findOne.userId !== userId) {
-      throw { name: "UNAUTHENTICATED" };
+    if (!booking) {
+      throw new Error("Booking not found or doesn't belong to this user");
+    }
+
+    const updatedBooking = await booking.update({
+      room_condition: "Canceled",
+    });
+
+    if (!updatedBooking) {
+      throw new Error("Booking not found or doesn't belong to this user");
     }
   }
 
-  static async ViewAdmin_Service(page = 1, limit = 10) {
+  static async ViewAdmin_Service(page = 1, limit = 6) {
     const offset = (page - 1) * limit;
 
     const bookings = await Booking.findAll({
       offset: offset,
       limit: limit,
+      include: [
+        {
+          model: Room,
+        },
+      ],
     });
 
     const totalBookings = await Booking.count();

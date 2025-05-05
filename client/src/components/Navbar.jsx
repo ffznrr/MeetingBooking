@@ -12,7 +12,10 @@ const Navbar = () => {
     <>
       <div className="w-full bg-[#3F4F44] p-5 flex justify-between">
         <div>
-          <h1 className="text-[#FBFFE4] text-2xl font-custom font-cal hover:cursor-grab inline">
+          <h1
+            onClick={() => navigate("/")}
+            className="text-[#FBFFE4] text-2xl font-custom font-cal hover:cursor-grab inline"
+          >
             BookTheMeet
           </h1>
         </div>

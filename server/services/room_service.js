@@ -26,7 +26,7 @@ class room_service {
     return result;
   }
 
-  static async getroom(id, page = 1, limit = 10) {
+  static async getroom(id, page = 1, limit = 6) {
     const offset = (page - 1) * limit;
 
     const totalRooms = await Room.count();

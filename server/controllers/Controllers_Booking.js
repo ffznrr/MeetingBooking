@@ -32,7 +32,6 @@ class Booking {
 
       let result;
       if (role == "User") {
-        console.log(role);
         result = await Booking_service.CancelBookUser_Service(id, userId);
       } else {
         result = await Booking_service.CancelBookAdmin_Service(id);
@@ -49,7 +48,7 @@ class Booking {
   static async controllers_viewbook(req, res, next) {
     try {
       const { id, role } = req.additionalData;
-      const { page = 1, limit = 10 } = req.query;
+      const { page = 1, limit = 6 } = req.query;
       let result;
       if (role == "User") {
         result = await Booking_service.ViewUser_Service(page, limit, id);
