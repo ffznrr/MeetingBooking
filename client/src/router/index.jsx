@@ -1,7 +1,14 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  redirect,
+  RouterProvider,
+} from "react-router-dom";
 
 import AuthPage from "../view/AuthPage";
 import BaseLayout from "../components/BaseLayout";
+import Toastify from "toastify-js";
+import HomePage from "../view/HomePage";
+import Session from "../view/Session";
 
 const router = createBrowserRouter([
   {
@@ -26,11 +33,20 @@ const router = createBrowserRouter([
           },
           onClick: function () {}, // Callback after click
         }).showToast();
-        return redirect("/login");
+        return redirect("/Auth");
       }
       return null;
     },
-    Children: [],
+    children: [
+      {
+        path: "/",
+        element: <HomePage />,
+      },
+      {
+        path: "/reserve/:id",
+        element: <Session />,
+      },
+    ],
   },
 ]);
 

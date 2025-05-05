@@ -55,10 +55,33 @@ class Booking_service {
     if (!result) throw { name: "Data Not Found" };
   }
 
-  static async ViewUser_Service(id) {
-    let res = await Booking.findAll({ where: { userId: id } });
+  static async ViewUser_Service(page = 1, limit = 10, userId) {
+    const offset = (page - 1) * limit;
 
-    return res;
+    const bookings = await Booking.findAll({
+      where: { userId: userId },
+      offset: offset,
+      limit: limit,
+      include: [
+        {
+          model: Room,
+          required: true,
+        },
+      ],
+    });
+
+    const totalBookings = await Booking.count({
+      where: { userId: userId },
+    });
+
+    const totalPages = Math.ceil(totalBookings / limit);
+
+    return {
+      bookings,
+      totalBookings,
+      totalPages,
+      currentPage: page,
+    };
   }
 
   static async CancelBookAdmin_Service(id) {
@@ -81,8 +104,24 @@ class Booking_service {
     }
   }
 
-  static async ViewAdmin_Service() {
-    return await Booking.findAll();
+  static async ViewAdmin_Service(page = 1, limit = 10) {
+    const offset = (page - 1) * limit;
+
+    const bookings = await Booking.findAll({
+      offset: offset,
+      limit: limit,
+    });
+
+    const totalBookings = await Booking.count();
+
+    const totalPages = Math.ceil(totalBookings / limit);
+
+    return {
+      bookings,
+      totalBookings,
+      totalPages,
+      currentPage: page,
+    };
   }
 
   static async findName(id) {

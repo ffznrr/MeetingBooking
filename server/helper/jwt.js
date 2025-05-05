@@ -5,11 +5,11 @@ const sign = (password) => {
   return jwt.sign(password, jwtcode);
 };
 
-const verify = (password) => {
+const verifyToken = (password) => {
   return jwt.verify(password, jwtcode);
 };
 
 module.exports = {
   sign,
-  verify,
+  verifyToken,
 };

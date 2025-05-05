@@ -49,11 +49,12 @@ class Booking {
   static async controllers_viewbook(req, res, next) {
     try {
       const { id, role } = req.additionalData;
+      const { page = 1, limit = 10 } = req.query;
       let result;
       if (role == "User") {
-        result = await Booking_service.ViewUser_Service(id);
+        result = await Booking_service.ViewUser_Service(page, limit, id);
       } else {
-        result = await Booking_service.ViewAdmin_Service();
+        result = await Booking_service.ViewAdmin_Service(page, limit);
       }
 
       if (result.length < 1) {

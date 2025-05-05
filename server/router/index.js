@@ -12,7 +12,8 @@ app.post("/login", Authentication.login);
 app.use(UserAuthentication);
 // Room
 app.post("/createroom", AdminAuthorization.AdminAuth, Room.createRoom);
-app.get("/viewroom", Room.getRoom);
+app.get("/viewroom", Room.ViewRoom_controllers);
+app.get("/viewroomdetail/:id", Room.ViewRoomDetail_controllers);
 
 // Booking
 app.post("/createbooking", Booking.controllers_createBook);

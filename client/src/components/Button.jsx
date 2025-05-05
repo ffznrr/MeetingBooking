@@ -1,7 +1,11 @@
-const Button = ({ className, text, type }) => {
+const Button = ({ className, text, type, onClick }) => {
   return (
     <>
-      <button type={type} className={`w-20 h-10 border-1 ${className}`}>
+      <button
+        onClick={onClick}
+        type={type}
+        className={`w-20 h-10 border-1 ${className}`}
+      >
         {text}
       </button>
     </>

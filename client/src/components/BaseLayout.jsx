@@ -4,8 +4,10 @@ import { Outlet } from "react-router-dom";
 const BaseLayout = () => {
   return (
     <>
-      <Navbar />
-      <Outlet />
+      <div className="w-full min-h-screen bg-amber-200">
+        <Navbar />
+        <Outlet />
+      </div>
     </>
   );
 };

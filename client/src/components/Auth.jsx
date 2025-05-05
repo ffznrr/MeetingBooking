@@ -3,11 +3,13 @@ import Button from "./Button";
 import { login, register } from "../api/services/AuthServices";
 import { useMutation } from "@tanstack/react-query";
 import Toastify from "toastify-js";
+import { useNavigate } from "react-router-dom";
 
 const Auth = () => {
   const [SeenPassword, setSeenPassword] = useState(false);
   const [isRegister, setIsRegister] = useState(false);
   const [formData, setFormData] = useState({ username: "", password: "" });
+  const navigate = useNavigate();
 
   const {
     mutate: loginMutate,
@@ -16,6 +18,7 @@ const Auth = () => {
   } = useMutation({
     mutationFn: login,
     onSuccess: (data) => {
+      localStorage.setItem("access_token", data.access_token);
       Toastify({
         text: "Login Success",
         duration: 3000,
@@ -25,6 +28,7 @@ const Auth = () => {
           background: "linear-gradient(to right, #3F4F44, #3F4F44)",
         },
       }).showToast();
+      navigate("/");
     },
     onError: (error) => {
       Toastify({
