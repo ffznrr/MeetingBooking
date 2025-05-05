@@ -156,7 +156,7 @@ const Session = () => {
     if (!bookinghour) return time;
     const matchingBookings = bookinghour.filter(
       (v) =>
-        time >= v.booked_hour &&
+        time > v.booked_hour &&
         time <= v.booked_hour_end &&
         v.room_condition == "Booked" &&
         v.book_date == getYear(dateParam)

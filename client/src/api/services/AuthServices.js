@@ -1,4 +1,4 @@
-const URL = process.env.REACT_APP_API_URL;
+const URL = import.meta.env.VITE_API_KEY;
 
 export const login = async (data) => {
   const response = await fetch(`${URL}/login`, {

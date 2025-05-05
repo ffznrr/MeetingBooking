@@ -1,4 +1,4 @@
-const URL = process.env.REACT_APP_API_URL;
+const URL = import.meta.env.VITE_API_KEY;
 
 export const ViewBooking = async (token, page) => {
   const response = await fetch(`${URL}/viewbooking?page=${page}`, {
