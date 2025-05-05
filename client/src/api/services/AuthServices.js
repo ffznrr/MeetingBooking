@@ -1,4 +1,4 @@
-const URL = "http://localhost:3000";
+const URL = process.env.REACT_APP_API_URL;
 
 export const login = async (data) => {
   const response = await fetch(`${URL}/login`, {

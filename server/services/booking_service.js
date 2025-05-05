@@ -4,11 +4,9 @@ class Booking_service {
   static async createbook(obj) {
     let { book_date, booked_hour, roomId, booked_hour_end, userId } = obj;
 
-    // Split the start and end time
     let booked_hour_split = booked_hour.split(":");
     let booked_hour_end_split = booked_hour_end.split(":");
 
-    // Check if the end time is later than the start time
     if (
       Number(booked_hour_end_split[0]) < Number(booked_hour_split[0]) ||
       (Number(booked_hour_end_split[0]) === Number(booked_hour_split[0]) &&
@@ -17,7 +15,6 @@ class Booking_service {
       throw { name: "The end time must be later than the booking time." };
     }
 
-    // Check for overlapping bookings for the same date and room
     const overlappingBooking = await Booking.findOne({
       where: {
         roomId,
@@ -30,7 +27,6 @@ class Booking_service {
       let overbookedhour_end_split =
         overlappingBooking.booked_hour_end.split(":");
 
-      // Convert all times into minutes for easier comparison
       let booked_start_minutes =
         Number(booked_hour_split[0]) * 60 + Number(booked_hour_split[1]);
       let booked_end_minutes =
@@ -42,7 +38,6 @@ class Booking_service {
         Number(overbookedhour_end_split[0]) * 60 +
         Number(overbookedhour_end_split[1]);
 
-      // Check if the booking time overlaps with an existing booking
       if (
         booked_start_minutes < overbooked_end_minutes &&
         booked_end_minutes > overbooked_start_minutes &&
@@ -54,7 +49,6 @@ class Booking_service {
       }
     }
 
-    // Create the booking if no overlap is found
     const result = await Booking.create({
       book_date,
       booked_hour,

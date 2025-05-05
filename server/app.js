@@ -18,4 +18,6 @@ app.use(router);
 const ErrorHandler = require("./middleware/errorHandler");
 app.use(ErrorHandler);
 
-module.exports = app;
+app.listen(PORT, () => {
+  console.log(`connected localhost ${PORT}`);
+});

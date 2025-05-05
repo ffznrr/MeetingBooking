@@ -1,4 +1,4 @@
-const URL = "http://localhost:3000";
+const URL = process.env.REACT_APP_API_URL;
 
 export const ViewBooking = async (token, page) => {
   const response = await fetch(`${URL}/viewbooking?page=${page}`, {
