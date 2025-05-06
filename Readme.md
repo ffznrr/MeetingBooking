@@ -5,8 +5,11 @@ How to Run The App
 # Development
 
 1. go to folder server with terminal do this "cd ./server",
-2. run "npm install"
-3. run "nodemon bin/www.js"
+2. run "npx sequelize db:create"
+3. run "npx sequelize db:migrate"
+4. Make sure create .env and development section in .env is not empty
+5. run "npm install"
+6. run "nodemon bin/www.js"
 
 # Testing
 
