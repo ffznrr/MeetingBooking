@@ -15,7 +15,7 @@ How to Run The App
 
 1. go to folder server with terminal do this "cd ./server",
 2. Make sure create .env and testing section in .env is not empty
-3. run "npx sequelize db:create"
+3. run "npx sequelize db:create --env test"
 4. run "npm run test"
 
 ## Client
