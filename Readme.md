@@ -21,3 +21,7 @@ How to Run The App
 2. Make sure create .env , and make .env is not empty
 3. run "npm install"
 4. run "npm run dev"
+
+## Architecture
+
+The architectural pattern used in this project is a REST API, featuring React on the client side, Express.js on the server side with Sequelize as the ORM, JSON Web Tokens for authentication, and deployed on Vercel.
